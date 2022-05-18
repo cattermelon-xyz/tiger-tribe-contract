@@ -1,15 +1,15 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
-import { CONTRACTS, ADDRESSES } from "../constants";
+import { CONTRACTS } from "../constants";
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
     const { deployments, getNamedAccounts } = hre;
     const { deploy } = deployments;
     const { deployer } = await getNamedAccounts();
 
-    await deploy(CONTRACTS.NFTMarket, {
+    await deploy(CONTRACTS.Market, {
         from: deployer,
-        args: [ADDRESSES.BUSD, deployer],
+        args: [deployer],
         log: true,
         skipIfAlreadyDeployed: true,
     });

@@ -28,7 +28,7 @@ contract TigerTribe is ERC721, ERC721Enumerable, ERC721URIStorage, Pausable, Own
     uint256 public redeemableAt;
     address public backedTokenAddress;
     
-    mapping(uint256 => uint256) public backedAmount;
+    mapping(uint256 => uint256) public backedAmounts;
 
     constructor(string memory _baseUri) ERC721("Hectagon Tiger Tribe", "HTT") {
         baseURI = _baseUri;
@@ -112,7 +112,7 @@ contract TigerTribe is ERC721, ERC721Enumerable, ERC721URIStorage, Pausable, Own
         _safeMint(_to, tokenId);
         _setTokenURI(tokenId, _uri);
 
-        backedAmount[tokenId] = _amount;
+        backedAmounts[tokenId] = _amount;
     }
 
     function safeMintTokens(
@@ -147,7 +147,7 @@ contract TigerTribe is ERC721, ERC721Enumerable, ERC721URIStorage, Pausable, Own
     function redeem(uint256 _tokenId) public {
         require(msg.sender == ownerOf(_tokenId), "Sender not owner!");
 
-        uint256 amount = backedAmount[_tokenId];
+        uint256 amount = backedAmounts[_tokenId];
         require(backedTokenAddress != address(0), "backedToken is not set");
 
         uint48 currentTime = uint48(block.timestamp);
@@ -161,7 +161,7 @@ contract TigerTribe is ERC721, ERC721Enumerable, ERC721URIStorage, Pausable, Own
 
         _burn(_tokenId);
 
-        delete backedAmount[_tokenId];
+        delete backedAmounts[_tokenId];
 
         IERC20(backedTokenAddress).transfer(msg.sender, backedTokenAmount);
 
