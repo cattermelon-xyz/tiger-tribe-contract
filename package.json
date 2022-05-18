@@ -8,6 +8,7 @@
     "compile": "hardhat compile",
     "clean": "hardhat clean",
     "test": "hardhat test",
+    "coverage": "hardhat coverage",
     "lint:fix": "eslint --fix \"**/*.{js,ts}\" && solhint --fix src/**/*.sol",
     "deploy:testnet": "hardhat --network testnet deploy",
     "deploy:mainnet": "hardhat --network mainnet deploy",

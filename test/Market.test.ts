@@ -4,10 +4,10 @@ import chai, { expect } from "chai";
 import { ethers, waffle } from "hardhat";
 import { MockContract, MockContractFactory, smock } from "@defi-wonderland/smock";
 import {
-    NFTMarket,
-    NFTMarket__factory,
+    Market,
+    Market__factory,
     TigerTribe,
-    HectagonNFT__factory,
+    TigerTribe__factory,
     MockERC20__factory,
     MockERC20,
 } from "../typechain";
@@ -15,12 +15,12 @@ const { BigNumber } = ethers;
 
 chai.use(smock.matchers);
 
-describe("NFTMarket", () => {
+describe("Market", () => {
     let owner: SignerWithAddress;
     let other: SignerWithAddress;
     let tester: SignerWithAddress;
     let tigerTribe: TigerTribe;
-    let market: NFTMarket;
+    let market: Market;
     let busdFake: MockContract<MockERC20>;
     let erc20Factory: MockContractFactory<MockERC20__factory>;
 
@@ -36,21 +36,20 @@ describe("NFTMarket", () => {
     const BUSD_SYMBOL = "BUSD";
     const BUSD_INITIAL_MINT = "100000000000000000000"; // 100
 
-    const NOW = Math.floor(Date.now() / 1000);
-    const ONE_DAY_IN_TIMESTAMP = 86400;
     const BNB = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 
     beforeEach(async () => {
         [owner, other, tester] = await ethers.getSigners();
 
-        tigerTribe = await new HectagonNFT__factory(owner).deploy(BASE_URI);
+        tigerTribe = await new TigerTribe__factory(owner).deploy(BASE_URI);
         erc20Factory = await smock.mock("MockERC20");
         busdFake = await erc20Factory.deploy(BUSD_NAME, BUSD_SYMBOL);
         await busdFake.mint(owner.address, BUSD_INITIAL_MINT);
         await busdFake.mint(tester.address, BUSD_INITIAL_MINT);
         await busdFake.mint(tigerTribe.address, BUSD_INITIAL_MINT);
 
-        market = await new NFTMarket__factory(owner).deploy(busdFake.address, other.address);
+        market = await new Market__factory(owner).deploy(other.address);
+        await market.enableTokens(busdFake.address);
     });
 
     describe("constructor", () => {
@@ -84,27 +83,32 @@ describe("NFTMarket", () => {
 
     describe("setTax", () => {
         it("must be done by owner", async () => {
+            await market.setTax("100");
+            expect(await market.tax()).to.be.equal("100");
+        });
+
+        it("must be done by only owner", async () => {
             await expect(market.connect(other).setTax("100")).to.be.reverted;
         });
     });
 
     describe("setTaxRecipient", () => {
         it("must be done by owner", async () => {
+            await market.setTaxRecipient(owner.address);
+            expect(await market.taxRecipient()).to.be.equal(owner.address);
+        });
+
+        it("must be done by only wner", async () => {
             await expect(market.connect(other).setTaxRecipient(owner.address)).to.be.reverted;
         });
     });
 
     describe("Exchange activity", () => {
         beforeEach(async () => {
-            await tigerTribe.setBackedToken(
-                BUSD_SYMBOL,
-                busdFake.address,
-                (NOW + ONE_DAY_IN_TIMESTAMP).toString()
-            );
+            await tigerTribe.setBackedToken(busdFake.address);
             await tigerTribe.safeMint(
                 owner.address,
                 MOCK_URI_TOKEN,
-                BUSD_SYMBOL,
                 BigNumber.from(MOCK_AMOUNT_BUSD_BACKED),
                 1
             );

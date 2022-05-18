@@ -11,7 +11,7 @@ import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 
-contract NFTMarket is Ownable, Pausable, IERC721Receiver {
+contract Market is Ownable, Pausable, IERC721Receiver {
     using EnumerableSet for EnumerableSet.UintSet;
     using EnumerableSet for EnumerableSet.AddressSet;
     using SafeERC20 for IERC20;
@@ -55,10 +55,9 @@ contract NFTMarket is Ownable, Pausable, IERC721Receiver {
     // ############
     // Constructor
     // ############
-    constructor(IERC20 _acceptedToken, address _taxRecipient) isTokenContract(_acceptedToken) {
+    constructor(address _taxRecipient) {
         taxRecipient = _taxRecipient;
 
-        enableTokens(_acceptedToken);
         acceptedTokens[IERC20(BNB)] = true;
     }
 
