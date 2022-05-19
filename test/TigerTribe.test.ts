@@ -117,6 +117,19 @@ describe("TigerTribe", () => {
                 ).to.be.reverted;
             });
         });
+
+        describe("lockMetadata", () => {
+            it("can not set base uri when lock metadata", async () => {
+                await tigerTribe.lockMetadata();
+                await expect(tigerTribe.connect(other).setBaseURI(NEW_BASE_URI)).to.be.reverted;
+            });
+
+            it("can lock metadata when not lock", async () => {
+                await tigerTribe.lockMetadata();
+                expect(await tigerTribe.lockedMetadata()).to.equal(true);
+                await expect(tigerTribe.lockMetadata()).to.be.reverted;
+            });
+        });
     });
 
     describe("backed-token", () => {
@@ -151,9 +164,9 @@ describe("TigerTribe", () => {
                     1
                 );
 
-                await expect(await tigerTribe.ownerOf(1)).to.equal(owner.address);
+                expect(await tigerTribe.ownerOf(1)).to.equal(owner.address);
 
-                await expect(await tigerTribe.tokenURI(1)).to.equal(BASE_URI + MOCK_URI_TOKEN);
+                expect(await tigerTribe.tokenURI(1)).to.equal(BASE_URI + MOCK_URI_TOKEN);
 
                 const backedAmount = await tigerTribe.backedAmounts(1);
                 expect(backedAmount).to.equal(MOCK_AMOUNT_BUSD_BACKED);
@@ -162,8 +175,8 @@ describe("TigerTribe", () => {
             it("can mint multiple tokens by owner contract", async () => {
                 await tigerTribe.safeMintTokens(owner.address, TOKENS_URI, BACKED_TOKENS_AMOUNT, 1);
 
-                await expect(await tigerTribe.ownerOf(1)).to.equal(owner.address);
-                await expect(await tigerTribe.ownerOf(2)).to.equal(owner.address);
+                expect(await tigerTribe.ownerOf(1)).to.equal(owner.address);
+                expect(await tigerTribe.ownerOf(2)).to.equal(owner.address);
             });
 
             it("can mint to other address by owner contract", async () => {
@@ -174,7 +187,7 @@ describe("TigerTribe", () => {
                     1
                 );
 
-                await expect(await tigerTribe.ownerOf(1)).to.equal(other.address);
+                expect(await tigerTribe.ownerOf(1)).to.equal(other.address);
             });
 
             it("can not mint to zero address", async () => {
@@ -397,16 +410,16 @@ describe("TigerTribe", () => {
                 await tigerTribe.approve(tigerTribe.address, "1");
                 await tigerTribe.redeem("1");
 
-                const ownerHectaBalanceAfteredeem: BigNumber = await mockHecta.balanceOf(
+                const ownerHectaBalanceAfteRedeem: BigNumber = await mockHecta.balanceOf(
                     owner.address
                 );
 
-                const contractBalanceOwnerAfteredeem: BigNumber = await mockHecta.balanceOf(
+                const contractBalanceOwnerAfteRedeem: BigNumber = await mockHecta.balanceOf(
                     tigerTribe.address
                 );
 
-                expect(BigNumber.from(10 * 10 ** 9)).to.equal(ownerHectaBalanceAfteredeem);
-                expect(BigNumber.from(90 * 10 ** 9)).to.equal(contractBalanceOwnerAfteredeem);
+                expect(BigNumber.from(10 * 10 ** 9)).to.equal(ownerHectaBalanceAfteRedeem);
+                expect(BigNumber.from(90 * 10 ** 9)).to.equal(contractBalanceOwnerAfteRedeem);
             });
         });
 

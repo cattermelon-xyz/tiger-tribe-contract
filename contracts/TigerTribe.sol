@@ -27,12 +27,18 @@ contract TigerTribe is ERC721, ERC721Enumerable, ERC721URIStorage, Pausable, Own
 
     uint256 public redeemableAt;
     address public backedTokenAddress;
+    bool public lockedMetadata;
     
     mapping(uint256 => uint256) public backedAmounts;
 
     constructor(string memory _baseUri) ERC721("Hectagon Tiger Tribe", "HTT") {
         baseURI = _baseUri;
         _tokenIdCounter.increment();
+    }
+
+    modifier whenNotLocked() {
+        require(!lockedMetadata, "Error: The Metadata is already locked!");
+        _;
     }
 
     function pause() public onlyOwner {
@@ -47,7 +53,7 @@ contract TigerTribe is ERC721, ERC721Enumerable, ERC721URIStorage, Pausable, Own
         return baseURI;
     }
 
-    function setBaseURI(string memory _uri) public onlyOwner {
+    function setBaseURI(string memory _uri) public onlyOwner whenNotLocked {
         baseURI = _uri;
     }
 
@@ -58,6 +64,10 @@ contract TigerTribe is ERC721, ERC721Enumerable, ERC721URIStorage, Pausable, Own
     function withdraw(address _backedTokenAddr, uint256 _amount) public onlyOwner {
         IERC20(_backedTokenAddr).transfer(msg.sender, _amount);
         emit Withdraw(_backedTokenAddr, _amount);
+    }
+
+    function lockMetadata() public virtual onlyOwner whenNotLocked {
+        lockedMetadata = true;
     }
 
 
@@ -135,7 +145,7 @@ contract TigerTribe is ERC721, ERC721Enumerable, ERC721URIStorage, Pausable, Own
         }
     }
 
-    function setTokensUri(uint256[] memory _ids, string[] memory _tokensURI) public onlyOwner {
+    function setTokensUri(uint256[] memory _ids, string[] memory _tokensURI) public onlyOwner whenNotLocked {
         require(_ids.length > 0, "ID arrays not empty");
         require(_ids.length == _tokensURI.length, "Length of ID and Data arrays is not equal!");
 
@@ -146,13 +156,13 @@ contract TigerTribe is ERC721, ERC721Enumerable, ERC721URIStorage, Pausable, Own
 
     function redeem(uint256 _tokenId) public {
         require(msg.sender == ownerOf(_tokenId), "Sender not owner!");
-
-        uint256 amount = backedAmounts[_tokenId];
         require(backedTokenAddress != address(0), "backedToken is not set");
+
 
         uint48 currentTime = uint48(block.timestamp);
         require(currentTime > redeemableAt, "Not redeemable!");
 
+        uint256 amount = backedAmounts[_tokenId];
         uint256 backedTokenAmount = (amount * (10**IERC20Metadata(backedTokenAddress).decimals())) / (10**decimals());
 
         uint256 maxRedeem = IERC20(backedTokenAddress).balanceOf(address(this));
