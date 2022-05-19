@@ -4,8 +4,7 @@ export const CONTRACTS: Record<string, string> = {
 };
 
 export const ADDRESSES: Record<string, string> = {
-    BUSD: "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56",
-    tigerTribe: "0x17E97043984ddd5d80D8B028dC50D3104BBf7aD1",
+    tigerTribe: "0x99A092552604Ce7a6e5ECb8C49f19dac752dCe66",
 };
 
-export const BASE_URI = "https://nftdata.hectagon.finance/metadata/";
+export const BASE_URI = "https://tigertribedata.hectagon.finance/metadata/";
