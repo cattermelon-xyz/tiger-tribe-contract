@@ -189,10 +189,10 @@ contract Market is Ownable, Pausable, IERC721Receiver {
     }
 
     function purchaseListing(uint256 _id) public payable isListed(_id) whenNotPaused {
-        (uint256 finalPrice, Listing memory listing) = executePurchaseLogic(_id);
+        (uint256 price, Listing memory listing) = executePurchaseLogic(_id);
         nftAddress.safeTransferFrom(address(this), msg.sender, _id);
 
-        emit PurchasedListing(msg.sender, listing.seller, _id, finalPrice, address(listing.currency));
+        emit PurchasedListing(msg.sender, listing.seller, _id, price, address(listing.currency));
     }
 
     function executePurchaseLogic(uint256 _id) private returns (uint256, Listing memory) {
@@ -230,7 +230,7 @@ contract Market is Ownable, Pausable, IERC721Receiver {
             // Transfer sale amount to seller
             payable(seller).transfer(finalPrice);
         }
-        return (finalPrice, listing);
+        return (price, listing);
     }
 
     function setTaxRecipient(address _taxRecipient) public onlyOwner {
