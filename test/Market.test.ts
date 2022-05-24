@@ -243,7 +243,7 @@ describe("Market", () => {
 
                 await expect(trx)
                     .to.emit(market, "PurchasedListing")
-                    .withArgs(tester.address, owner.address, 1, finalPrice, busdFake.address);
+                    .withArgs(tester.address, owner.address, 1, mockAmount, busdFake.address);
 
                 await expect(await busdFake.balanceOf(other.address)).to.be.eq(taxAmount);
                 await expect(await busdFake.balanceOf(tester.address)).to.be.eq(
@@ -275,7 +275,7 @@ describe("Market", () => {
                 const trx = await market.connect(tester).purchaseListing(1, options);
                 await expect(trx)
                     .to.emit(market, "PurchasedListing")
-                    .withArgs(tester.address, owner.address, 1, finalPrice, BNB);
+                    .withArgs(tester.address, owner.address, 1, mockAmount, BNB);
 
                 const receipt = await trx.wait();
                 const gasUsed = receipt.cumulativeGasUsed.mul(receipt.effectiveGasPrice);
