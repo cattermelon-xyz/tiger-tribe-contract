@@ -4,7 +4,7 @@ export const CONTRACTS: Record<string, string> = {
 };
 
 export const ADDRESSES: Record<string, string> = {
-    tigerTribe: "0x99A092552604Ce7a6e5ECb8C49f19dac752dCe66",
+    tigerTribe: "0x4Df4748C2e444fA2AF3B90CfA2516192F8655821",
 };
 
 export const BASE_URI = "https://tigertribedata.hectagon.finance/metadata/";
